@@ -1,3 +1,4 @@
+import {expect} from 'chai';
 import * as Rx from 'rxjs/Rx';
 import {ISuiteCallbackContext} from 'mocha';
 
@@ -32,6 +33,20 @@ describe('Experiment with Observable buffer', function (this: ISuiteCallbackCont
         // [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
         // [ [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ]
         // done.
+    });
+
+    it('Demonstrates a bug with zip', () => {
+        const slow = Rx.Observable.interval(10).take(10);
+        const fast = Rx.Observable.interval(3);
+
+        return slow
+            .zip(fast)
+            .toArray()
+            .toPromise()
+            .then(values => {
+                console.log(values);
+                values.forEach(([s, f]) => expect(s).to.be.equal(f));
+            });
     });
 });
 
