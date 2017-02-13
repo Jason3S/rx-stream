@@ -1,6 +1,6 @@
 {
   "name": "rxjs-stream",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "nodejs streams for rxjs 5",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -49,10 +49,11 @@
     "rimraf": "^2.5.4",
     "ts-node": "^2.1.0",
     "tslint": "^4.4.2",
-    "rxjs": "^5.1.0",
+    "rxjs": "^5.1.1",
     "typescript": "^2.1.6"
   },
   "dependencies": {
+    "stream-buffers": "^3.0.1"
   },
   "peerDependencies": {
     "rxjs": "^5.0.3"
