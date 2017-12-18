@@ -39,7 +39,6 @@
   },
   "homepage": "https://github.com/Jason3S/rx-stream#readme",
   "devDependencies": {
-    "@types/bluebird": "^3.5.18",
     "@types/chai": "^3.4.34",
     "@types/mocha": "^2.2.39",
     "@types/node": "^7.0.5",
