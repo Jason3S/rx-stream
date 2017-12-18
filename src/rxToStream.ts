@@ -6,7 +6,7 @@ export type Streamable = string | Buffer;
 /**
  * Transform the output of an Observable into a node readable stream.
  */
-export function rxToStream<T extends Streamable>(src: Rx.Observable<T>, options: stream.ReadableOptions = { encoding: 'utf8' }): stream.Readable {
+export function rxToStream<T extends Streamable>(src: Rx.Observable<T>, options: stream.ReadableOptions = { encoding: 'utf8' }, onError?: (error: Error, readable: stream.Readable) => void): stream.Readable {
 
     const trigger = new Rx.Subject<void>();
     let depth = 0;
@@ -19,10 +19,15 @@ export function rxToStream<T extends Streamable>(src: Rx.Observable<T>, options:
         },
     });
 
-    function close() {
-        Rx.Observable.interval(1).take(1).subscribe(
-            () => readable.push(null)
-        );
+    function close(err?: Error) {
+        try {
+            if (err && onError)
+                onError(err, readable);
+        } finally {
+            Rx.Observable.interval(1).take(1).subscribe(
+                () => readable.push(null)
+            );
+        }
     }
 
     function next() {
