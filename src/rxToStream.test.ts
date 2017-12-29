@@ -5,6 +5,8 @@ import {
     streamToStringRx,
 } from './index';
 
+import { Readable } from 'stream';
+
 describe('Validate to Stream', () => {
     it('rxToStream', () => {
         const data: string = 'This is a bit of text to have some fun with';
@@ -17,6 +19,27 @@ describe('Validate to Stream', () => {
             .then(result => {
                 expect(result).to.equal(data);
             });
+
+        return p;
+    });
+
+    it('rxToStream with error', () => {
+        const src = Rx.Observable.create((observer: Rx.Observer<void>) => {
+            setTimeout(() => observer.error(new Error('TEST_ERROR')), 1);
+        });
+        const stream = rxToStream(src, undefined, (err: Error, readable: Readable) => {
+            readable.emit('error', err);
+        });
+
+        let errorCaught;
+        stream.on('error', err => (errorCaught = err));
+
+        const p = streamToStringRx(stream)
+            .toPromise()
+            .then(() => {
+                expect(errorCaught).to.have.property('message', 'TEST_ERROR');
+            })
+            .catch(() => {});
 
         return p;
     });
