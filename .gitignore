@@ -39,3 +39,5 @@ jspm_packages
 # Ignore Built files
 dist/**
 
+# Ignore the lock file because we do not want to force others into particular versions.
+package-lock.json
