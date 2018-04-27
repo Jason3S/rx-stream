@@ -1,4 +1,5 @@
-import * as Rx from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
 import * as stream from 'stream';
 
 export type Streamable = string | Buffer;
@@ -6,9 +7,13 @@ export type Streamable = string | Buffer;
 /**
  * Transform the output of an Observable into a node readable stream.
  */
-export function rxToStream<T extends Streamable>(src: Rx.Observable<T>, options: stream.ReadableOptions = { encoding: 'utf8' }, onError?: (error: Error, readable: stream.Readable) => void): stream.Readable {
+export function rxToStream<T extends Streamable>(
+    src: Observable<T>,
+    options: stream.ReadableOptions = { encoding: 'utf8' },
+    onError?: (error: Error, readable: stream.Readable) => void
+): stream.Readable {
 
-    const trigger = new Rx.Subject<void>();
+    const trigger = new Subject<void>();
     let depth = 0;
     const maxDepth = 100;
 
@@ -24,7 +29,7 @@ export function rxToStream<T extends Streamable>(src: Rx.Observable<T>, options:
             if (err && onError)
                 onError(err, readable);
         } finally {
-            Rx.Observable.interval(1).take(1).subscribe(
+            Observable.interval(1).take(1).subscribe(
                 () => readable.push(null)
             );
         }
@@ -36,7 +41,7 @@ export function rxToStream<T extends Streamable>(src: Rx.Observable<T>, options:
             trigger.next();
         } else {
             // Slower to avoid running out of stack space.
-            Rx.Observable.interval().take(1).subscribe(
+            Observable.interval().take(1).subscribe(
                 () => trigger.next()
             );
         }
