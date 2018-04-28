@@ -15,8 +15,8 @@
     "tsc": "tsc -p .",
     "coverage": "npm run generate-code-coverage",
     "generate-code-coverage": "NODE_ENV=test nyc npm run test-ts",
-    "test-ts": "NODE_ENV=test mocha --compilers ts:ts-node/register --recursive --bail \"src/**/*.test.ts\"",
-    "test-watch": "npm run build && mocha --compilers ts:ts-node/register --watch --recursive \"src/**/*.test.ts\"",
+    "test-ts": "NODE_ENV=test mocha --require ts-node/register --recursive --bail \"src/**/*.test.ts\"",
+    "test-watch": "npm run build && mocha --require ts-node/register --watch --recursive \"src/**/*.test.ts\"",
     "prepublish": "npm run clean-build && npm test",
     "coverage-coveralls": "nyc report --reporter=text-lcov | coveralls",
     "travis-coverage": "npm run generate-code-coverage && npm run coverage-coveralls",
@@ -47,7 +47,6 @@
     "nyc": "^11.7.1",
     "rimraf": "^2.6.2",
     "rxjs": "^6.0.0",
-    "rxjs-compat": "^6.0.0",
     "ts-node": "^6.0.1",
     "tslint": "^5.9.1",
     "typescript": "^2.8.3"

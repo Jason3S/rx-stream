@@ -1,4 +1,5 @@
 import {Subject, Observable} from 'rxjs';
+import {map} from 'rxjs/operators'
 
 export function streamToRx(stream: NodeJS.ReadableStream): Subject<Buffer> {
     const subject = new Subject<Buffer>();
@@ -10,5 +11,5 @@ export function streamToRx(stream: NodeJS.ReadableStream): Subject<Buffer> {
 
 export function streamToStringRx(stream: NodeJS.ReadableStream, encoding: string = 'UTF-8'): Observable<string> {
     return streamToRx(stream)
-        .map(buffer => buffer.toString(encoding));
+        .pipe(map(buffer => buffer.toString(encoding)));
 }

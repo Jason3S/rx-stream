@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import * as stream from 'stream';
+import { reduce } from 'rxjs/operators';
 import {
     streamToStringRx
 } from './index';
@@ -10,7 +11,7 @@ describe('Validate Rx From Stream', () => {
         const bufferStream = new stream.PassThrough();
         bufferStream.end(data);
         return streamToStringRx(bufferStream)
-            .reduce((a, b) => a + b)
+            .pipe(reduce((a, b) => a + b))
             .toPromise()
             .then(result => {
                 expect(result).to.equal(data);

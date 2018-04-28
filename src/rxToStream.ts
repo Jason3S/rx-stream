@@ -1,4 +1,5 @@
-import {Observable, Subject} from 'rxjs';
+import {Observable, Subject, interval} from 'rxjs';
+import {take, zip} from 'rxjs/operators';
 import * as stream from 'stream';
 
 export type Streamable = string | Buffer;
@@ -28,7 +29,7 @@ export function rxToStream<T extends Streamable>(
             if (err && onError)
                 onError(err, readable);
         } finally {
-            Observable.interval(1).take(1).subscribe(
+            interval(1).pipe(take(1)).subscribe(
                 () => readable.push(null)
             );
         }
@@ -40,7 +41,7 @@ export function rxToStream<T extends Streamable>(
             trigger.next();
         } else {
             // Slower to avoid running out of stack space.
-            Observable.interval().take(1).subscribe(
+            interval().pipe(take(1)).subscribe(
                 () => trigger.next()
             );
         }
@@ -54,7 +55,7 @@ export function rxToStream<T extends Streamable>(
 
     trigger
         // Use zip to buffer the Observable so we only send when the stream is ready.
-        .zip(src, (_, src) => src)
+        .pipe(zip(src, (_, src) => src))
         .subscribe(
             // send the data and signal we can use more data.
             push,
