@@ -1,9 +1,7 @@
 import {expect} from 'chai';
 import * as stream from 'stream';
 import { reduce } from 'rxjs/operators';
-import {
-    streamToStringRx
-} from './index';
+import { streamToStringRx } from './index';
 
 describe('Validate Rx From Stream', () => {
     it('tests stream to Rx', () => {
@@ -18,4 +16,9 @@ describe('Validate Rx From Stream', () => {
             });
     });
 
+    it('should not be a subject', () => {
+        const bufferStream = new stream.PassThrough();
+        const observable = streamToStringRx(bufferStream);
+        expect((observable as any).next).not.to.be.a('function');
+    });
 });
