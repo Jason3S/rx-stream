@@ -1,5 +1,4 @@
-import {Observable, Subject, interval} from 'rxjs';
-import {take, zip} from 'rxjs/operators';
+import {Observable, Subscription} from 'rxjs';
 import * as stream from 'stream';
 
 export type Streamable = string | Buffer;
@@ -12,59 +11,70 @@ export function rxToStream<T extends Streamable>(
     options: stream.ReadableOptions = { encoding: 'utf8' },
     onError?: (error: Error, readable: stream.Readable) => void
 ): stream.Readable {
-
-    const trigger = new Subject<void>();
-    let depth = 0;
-    const maxDepth = 100;
-
-    const readable = new stream.Readable({
-        ...options,
-        read: () => {
-            trigger.next();
-        },
-    });
-
-    function close(err?: Error) {
-        try {
-            if (err && onError)
-                onError(err, readable);
-        } finally {
-            interval(1).pipe(take(1)).subscribe(
-                () => readable.push(null)
-            );
-        }
-    }
-
-    function next() {
-        if (depth < maxDepth) {
-            // Use the fastest method
-            trigger.next();
-        } else {
-            // Slower to avoid running out of stack space.
-            interval().pipe(take(1)).subscribe(
-                () => trigger.next()
-            );
-        }
-    }
-
-    function push(data: T) {
-        depth += 1;
-        readable.push(data) ? next() : null;
-        depth -= 1;
-    }
-
-    trigger
-        // Use zip to buffer the Observable so we only send when the stream is ready.
-        .pipe(zip(src, (_, src) => src))
-        .subscribe(
-            // send the data and signal we can use more data.
-            push,
-            // Close on error or complete.
-            close,
-            close
-        );
-
-    return readable;
+    return new ReadableObservableStream(options, src, onError);
 }
 
+class ReadableObservableStream<T> extends stream.Readable {
+    constructor(
+        options: stream.ReadableOptions,
+        private _source: Observable<T>,
+        private _onError: ((error: Error, readable: stream.Readable) => void) | undefined,
+    ) {
+        super(options);
+    }
 
+    private _isOpen = false;
+    private _hasError = false;
+    private _error: any;
+    private _waiting = 0;
+    private _subscription: Subscription;
+    private _buffer: T[] = [];
+
+    _read() {
+        const { _buffer } = this;
+
+        if (!this._subscription) {
+            this._subscription = this._source.subscribe({
+                next: value => {
+                    if (this._waiting > 0) {
+                        while (this._waiting > 0) {
+                            this._waiting--;
+                            const result = this.push(value);
+                            if (!result) break;
+                        }
+                    } else {
+                        _buffer.push(value);
+                    }
+                },
+                error: (err) => {
+                    this._isOpen = false;
+                    this._hasError = true;
+                    this._error = err;
+                },
+                complete: () => {
+                    this._isOpen = false;
+                },
+            });
+        }
+
+        if (_buffer.length > 0) {
+            while (_buffer.length > 0) {
+                const result = this.push(_buffer.shift());
+                if (!result) break;
+            };
+        } else {
+            if (this._isOpen) {
+                this._waiting++;
+            } else {
+                if (this._hasError) {
+                    this.emit('error', this._error);
+                    if (this._onError) {
+                        this._onError(this._error, this);
+                    }
+                } else {
+                    this.push(null);
+                }
+            }
+        }
+    }
+}
