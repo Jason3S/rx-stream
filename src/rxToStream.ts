@@ -24,7 +24,7 @@ class ReadableObservableStream<T> extends stream.Readable {
     }
 
     private _isOpen = false;
-    private _hasError = false;
+      private _hasError = false;
     private _error: any;
     private _waiting = 0;
     private _subscription: Subscription;
@@ -61,7 +61,7 @@ class ReadableObservableStream<T> extends stream.Readable {
             while (_buffer.length > 0) {
                 const result = this.push(_buffer.shift());
                 if (!result) break;
-            };
+            }
         } else {
             if (this._isOpen) {
                 this._waiting++;

@@ -70,7 +70,7 @@ describe('Validate to Stream', () => {
     });
 
     it('rxToStream large range', () => {
-        // This tests that we can send many small values to the stream on after another.
+        // This tests that we can send many small values to the stream one after another.
         // This is to make sure we do not run out of stack space.
         const max = 5000;
         const src = range(1, max);
