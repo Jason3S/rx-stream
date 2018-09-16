@@ -1,6 +1,6 @@
 import {expect} from 'chai';
-import {from, range, Observable, Subscriber} from 'rxjs';
-import {reduce, map, concatMap} from 'rxjs/operators';
+import {from, range, Observable, Subscriber, timer} from 'rxjs';
+import {reduce, map, concatMap, take} from 'rxjs/operators';
 import {
     rxToStream,
     streamToStringRx,
@@ -70,6 +70,24 @@ describe('Validate to Stream', () => {
                 expect(errorCaught).to.have.property('message', 'TEST_ERROR');
             })
             .catch(() => {});
+
+        return p;
+    });
+
+    it('tests with a delayed hot observable', () => {
+        // This tests that we can send many small values to the stream one after another.
+        // This is to make sure we do not run out of stack space.
+        const max = 5;
+        const src = timer(10, 1).pipe(take(max + 1));
+        const stream = rxToStream(src.pipe(map(a => a.toString())));
+
+        const p = streamToStringRx(stream).pipe(
+            map(a => Number.parseInt(a)),
+            reduce((a, b) => a + b),
+        ).toPromise()
+            .then(result => {
+                expect(result).to.equal((max * (max + 1)) / 2);
+            });
 
         return p;
     });

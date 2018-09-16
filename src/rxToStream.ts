@@ -24,24 +24,29 @@ class ReadableObservableStream<T> extends stream.Readable {
     }
 
     private _isOpen = false;
-      private _hasError = false;
+    private _hasError = false;
     private _error: any;
-    private _waiting = 0;
+    private _waiting = false;
     private _subscription: Subscription;
     private _buffer: T[] = [];
+
+    private emitError() {
+        this.emit('error', this._error);
+        if (this._onError) {
+            this._onError(this._error, this);
+        }
+    }
 
     _read() {
         const { _buffer } = this;
 
         if (!this._subscription) {
+            this._isOpen = true;
+            this._waiting = true;
             this._subscription = this._source.subscribe({
                 next: value => {
-                    if (this._waiting > 0) {
-                        while (this._waiting > 0) {
-                            this._waiting--;
-                            const result = this.push(value);
-                            if (!result) break;
-                        }
+                    if (this._waiting) {
+                        this._waiting = this.push(value);
                     } else {
                         _buffer.push(value);
                     }
@@ -50,27 +55,30 @@ class ReadableObservableStream<T> extends stream.Readable {
                     this._isOpen = false;
                     this._hasError = true;
                     this._error = err;
+                    if (this._waiting) {
+                        this.emitError();
+                    }
                 },
                 complete: () => {
                     this._isOpen = false;
+                    if (this._waiting) {
+                        this.push(null);
+                    }
                 },
             });
         }
 
         if (_buffer.length > 0) {
             while (_buffer.length > 0) {
-                const result = this.push(_buffer.shift());
-                if (!result) break;
+                this._waiting = this.push(_buffer.shift());
+                if (!this._waiting) break;
             }
         } else {
             if (this._isOpen) {
-                this._waiting++;
+                this._waiting = true;
             } else {
                 if (this._hasError) {
-                    this.emit('error', this._error);
-                    if (this._onError) {
-                        this._onError(this._error, this);
-                    }
+                    this.emitError();
                 } else {
                     this.push(null);
                 }
