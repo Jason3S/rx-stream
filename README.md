@@ -26,7 +26,7 @@ rxToStream(src).pipe(process.stdout);
 ### Read from a stream
 
 ```typescript
-import {streamToStringRx} from 'rxjs-stream';
+import {rxToStream, streamToStringRx} from 'rxjs-stream';
 
 // Read stdin and make it upper case then send it to stdout
 let ob = streamToStringRx(process.stdin)
