@@ -8,7 +8,7 @@ which only works with rxjs 4.
 ## Installation
 
 ```sh
-npm install --save rxjs-stream
+npm install --save rxjs rxjs-stream
 ```
 
 ## Usage
