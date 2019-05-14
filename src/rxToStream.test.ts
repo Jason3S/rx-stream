@@ -5,7 +5,7 @@ import {
     rxToStream,
     streamToStringRx,
 } from './index';
-import * as loremIpsum from 'lorem-ipsum';
+import { loremIpsum } from 'lorem-ipsum';
 import * as path from 'path';
 import { mkdirp } from 'fs-extra';
 import * as fs from 'fs-extra';
