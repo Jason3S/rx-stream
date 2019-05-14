@@ -24,7 +24,7 @@ describe('Validate Rx From Stream', () => {
         const result = observable
             .pipe(reduce((a, b) => a + b))
             .toPromise();
-        bufferStream.destroy();
+        bufferStream.destroy ? bufferStream.destroy() : bufferStream.end();
         expect(await result).to.equal(data);
     });
 
