@@ -1,11 +1,11 @@
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators'
+import {map} from 'rxjs/operators';
 
-export function streamToRx(stream: NodeJS.ReadableStream): Observable<Buffer> {
-    return new Observable<Buffer>(subscriber => {
+export function streamToRx<T = Buffer>(stream: NodeJS.ReadableStream): Observable<T> {
+    return new Observable<T>(subscriber => {
         const endHandler = () => subscriber.complete();
         const errorHandler = (e: Error) => subscriber.error(e);
-        const dataHandler = (data: Buffer) => subscriber.next(data);
+        const dataHandler = (data: T) => subscriber.next(data);
 
         stream.addListener('end', endHandler);
         stream.addListener('error', errorHandler);
