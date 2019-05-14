@@ -63,7 +63,7 @@
   },
   "files": [
     "dist",
-    "src",
+    "!**/*.map",
     "!**/*.test.*",
     "!**/*.spec.*"
   ],
@@ -71,7 +71,9 @@
     "include": [
       "src/**/*.ts"
     ],
-    "exclude": [],
+    "exclude": [
+      "**/*.test.ts"
+    ],
     "extension": [
       ".ts"
     ],
