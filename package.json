@@ -39,8 +39,9 @@
   "homepage": "https://github.com/Jason3S/rx-stream#readme",
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^8.10.48",
+    "@types/fs-extra": "^7.0.0",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^8.10.49",
     "chai": "^4.2.0",
     "coveralls": "^3.0.3",
     "fs-extra": "^8.0.1",
@@ -50,9 +51,9 @@
     "prettier": "^1.17.1",
     "rimraf": "^2.6.3",
     "rxjs": "^6.5.2",
-    "ts-node": "^8.1.0",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "ts-node": "^8.2.0",
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.1"
   },
   "dependencies": {},
   "peerDependencies": {
