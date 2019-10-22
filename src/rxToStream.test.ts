@@ -1,6 +1,6 @@
 import {expect} from 'chai';
-import {from, range, Observable, Subscriber, timer} from 'rxjs';
-import {reduce, map, concatMap, take} from 'rxjs/operators';
+import {from, range, Observable, Subscriber, timer, Subscription} from 'rxjs';
+import {reduce, map, concatMap, take, finalize} from 'rxjs/operators';
 import {
     rxToStream,
     streamToStringRx,
@@ -17,13 +17,33 @@ describe('Validate to Stream', () => {
     it('rxToStream', () => {
         const data: string = 'This is a bit of text to have some fun with';
         const src = from(data.split(' '));
+
+        const injectedSubscription = new Subscription();
+
+        const originalSubscribe = src.subscribe.bind(src);
+
+        const mockedSubscribe = ((...params: Parameters<typeof src.subscribe>) => {
+            injectedSubscription.add(originalSubscribe(...params));
+            return injectedSubscription;
+        }) as typeof src.subscribe;
+
+        src.subscribe = mockedSubscribe;
+
         const stream = rxToStream(src);
 
         const p = streamToStringRx(stream)
-            .pipe(reduce((a, b) => a + ' ' + b))
+            .pipe(
+                reduce((a, b) => a + ' ' + b),
+                finalize(() => {
+                    // destroy source stream as this would be done by conventional stream api's
+                    // like https://nodejs.org/api/stream.html#stream_stream_pipeline_streams_callback
+                    stream.destroy();
+                })
+            )
             .toPromise()
             .then(result => {
                 expect(result).to.equal(data);
+                expect(injectedSubscription.closed).to.be.true;
             });
 
         return p;
