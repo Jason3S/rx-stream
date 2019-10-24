@@ -1,7 +1,10 @@
 # Changelog
 
+## [3.1.0]
+* Fix [stream never unsubscribes from the source observable when destroyed · Issue #12 · Jason3S/rx-stream](https://github.com/Jason3S/rx-stream/issues/12)
+
 ## [3.0.1]
-* Added a unit test that reads / writes to a file. I was investigating whey rx-stream broke with rxjs 6.3. In the end, it was due to an issue with rxjs.
+* Added a unit test that reads / writes to a file. I was investigating when rx-stream broke with rxjs 6.3. In the end, it was due to an issue with rxjs.
   See: [rxjs #4071](https://github.com/ReactiveX/rxjs/issues/4071), [rxjs #4072](https://github.com/ReactiveX/rxjs/issues/4072), [rxjs #4073](https://github.com/ReactiveX/rxjs/issues/4073)
 
 ## [3.0.0]
