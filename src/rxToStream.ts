@@ -37,6 +37,12 @@ class ReadableObservableStream<T> extends stream.Readable {
         }
     }
 
+    _destroy() {
+        if (this._subscription) {
+            this._subscription.unsubscribe();
+        }
+    }
+
     _read() {
         const { _buffer } = this;
 
