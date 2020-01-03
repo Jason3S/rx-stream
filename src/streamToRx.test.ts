@@ -1,7 +1,8 @@
 import {expect} from 'chai';
 import * as stream from 'stream';
-import { reduce } from 'rxjs/operators';
+import { reduce, tap } from 'rxjs/operators';
 import { streamToStringRx } from './index';
+import { BehaviorSubject } from 'rxjs';
 
 describe('Validate Rx From Stream', () => {
     it('tests stream to Rx', () => {
@@ -39,4 +40,44 @@ describe('Validate Rx From Stream', () => {
             .toPromise();
         expect(result).to.equal(data);
     });
+
+    it('tests stream pause', done => {
+        const data: string = 'This is a bit of text to have some fun with';
+        const bufferStream = new stream.PassThrough();
+        const timegap = 20;
+
+        const pauser = new BehaviorSubject<boolean>(false);
+        bufferStream.write(data.slice(0, data.length / 2), 'utf8');
+        setTimeout(() => {
+            bufferStream.end(data.slice(data.length / 2), 'utf8');
+        }, timegap);
+
+        return streamToStringRx(bufferStream, 'utf8', pauser)
+            .pipe(
+                tap(() => {
+                    if (pauser.value === true) {
+                        throw new Error('should be paused');
+                    }
+                    pauser.next(true);
+                }),
+                tap(() => {
+                    setTimeout(() => {
+                        pauser.next(false);
+                    }, timegap * 2);
+                }),
+                reduce((a, b) => a + b)
+            )
+            .subscribe({
+                next: result => {
+                    expect(result).to.equal(data);
+                },
+                complete: () => {
+                    done();
+                },
+                error: err => {
+                    done(err);
+                }
+            });
+    });
+
 });
