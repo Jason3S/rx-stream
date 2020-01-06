@@ -2,7 +2,7 @@ import {Observable, Subscription} from 'rxjs';
 import {map, distinctUntilChanged} from 'rxjs/operators';
 
 export function streamToRx<T = Buffer>(
-    stream: NodeJS.ReadableStream, 
+    stream: NodeJS.ReadableStream,
     pauser?: Observable<boolean>
 ): Observable<T> {
     return new Observable<T>(subscriber => {

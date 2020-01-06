@@ -4,7 +4,14 @@ node_js:
   - "12"
   - "10"
   - "8"
+install:
+  - npm ci
 script:
-  - npm install
-  - npm run build
   - npm test
+  - npm run lint-travis
+
+jobs:
+  include:
+    - stage: "Coverage"
+      script:
+        - npm run travis-coverage

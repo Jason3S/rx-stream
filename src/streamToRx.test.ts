@@ -44,13 +44,13 @@ describe('Validate Rx From Stream', () => {
     it('tests stream pause', done => {
         const data: string = 'This is a bit of text to have some fun with';
         const bufferStream = new stream.PassThrough();
-        const timegap = 20;
+        const delayTime = 20;
 
         const pauser = new BehaviorSubject<boolean>(false);
         bufferStream.write(data.slice(0, data.length / 2), 'utf8');
         setTimeout(() => {
             bufferStream.end(data.slice(data.length / 2), 'utf8');
-        }, timegap);
+        }, delayTime);
 
         return streamToStringRx(bufferStream, 'utf8', pauser)
             .pipe(
@@ -63,7 +63,7 @@ describe('Validate Rx From Stream', () => {
                 tap(() => {
                     setTimeout(() => {
                         pauser.next(false);
-                    }, timegap * 2);
+                    }, delayTime * 2);
                 }),
                 reduce((a, b) => a + b)
             )
