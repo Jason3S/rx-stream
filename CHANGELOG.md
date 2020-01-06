@@ -1,7 +1,10 @@
 # Changelog
 
+## [3.1.1]
+* Address [Back Pressure support · Issue #13](https://github.com/Jason3S/rx-stream/issues/13)
+
 ## [3.1.0]
-* Fix [stream never unsubscribes from the source observable when destroyed · Issue #12 · Jason3S/rx-stream](https://github.com/Jason3S/rx-stream/issues/12)
+* Fix [stream never unsubscribes from the source observable when destroyed · Issue #12](https://github.com/Jason3S/rx-stream/issues/12)
 
 ## [3.0.1]
 * Added a unit test that reads / writes to a file. I was investigating when rx-stream broke with rxjs 6.3. In the end, it was due to an issue with rxjs.
