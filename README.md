@@ -23,6 +23,19 @@ let src = Rx.Observable.from(data.split(' '));
 rxToStream(src).pipe(process.stdout);
 ```
 
+### Writing objects to a stream
+
+To write objects, you must pass in the `ReadableOptions` with `objectMode` to be true: `{ objectMode: true }`
+
+```typescript
+import {rxToStream} from 'rxjs-stream';
+
+let data = 'This is a bit of text to have some fun with';
+let wordObj = data.split(' ').map(text => ({ text }));
+let src = Rx.Observable.from(wordObj);
+let stream = rxToStream(src, { objectMode: true });
+```
+
 ### Read from a stream
 
 ```typescript

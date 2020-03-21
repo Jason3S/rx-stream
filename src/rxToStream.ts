@@ -2,10 +2,23 @@ import {Observable, Subscription} from 'rxjs';
 import * as stream from 'stream';
 
 export type Streamable = string | Buffer;
+export interface ObjectReadableOptions extends stream.ReadableOptions {
+    objectMode: true;
+}
 
 /**
  * Transform the output of an Observable into a node readable stream.
  */
+export function rxToStream<T>(
+    src: Observable<T>,
+    options: ObjectReadableOptions,
+    onError?: (error: Error, readable: stream.Readable) => void
+): stream.Readable;
+export function rxToStream<T extends Streamable>(
+    src: Observable<T>,
+    options?: stream.ReadableOptions,
+    onError?: (error: Error, readable: stream.Readable) => void
+): stream.Readable;
 export function rxToStream<T extends Streamable>(
     src: Observable<T>,
     options: stream.ReadableOptions = { encoding: 'utf8' },
