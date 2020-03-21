@@ -1,5 +1,8 @@
 # Changelog
 
+## [3.2.0]
+* Support Object streams [How do we create an Object stream from Observable? · Issue #17](https://github.com/Jason3S/rx-stream/issues/17)
+
 ## [3.1.1]
 * Address [Back Pressure support · Issue #13](https://github.com/Jason3S/rx-stream/issues/13)
 
