@@ -3,7 +3,7 @@ import * as stream from 'stream';
 
 export type Streamable = string | Buffer;
 export interface ObjectReadableOptions extends stream.ReadableOptions {
-    objectMode: true
+    objectMode: true;
 }
 
 /**
