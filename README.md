@@ -67,3 +67,7 @@ let stream = rxToStream(wordsBuffered);
 
 stream.pipe(process.stdout);
 ```
+
+## Compatibility
+
+This library is tested with Node 10 and above.
