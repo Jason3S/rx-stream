@@ -8,9 +8,3 @@ install:
 script:
   - npm test
   - npm run lint-travis
-
-jobs:
-  include:
-    - stage: "Coverage"
-      script:
-        - npm run travis-coverage

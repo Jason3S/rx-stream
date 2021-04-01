@@ -1,15 +1,13 @@
-// cSpell Settings
 {
-    // Version of the setting file.  Always 0.1
     "version": "0.1",
-    // language - current active spelling language
     "language": "en",
-    // words - list of words to be always considered correct
     "words": [
-        "Pausable",
+        "api's",
+        "coverallsapp",
+        "lcov",
         "Observables",
-        "Streamable",
-        "api's"
+        "Pausable",
+        "Streamable"
     ],
     "ignorePaths": [
         "package*.json",
