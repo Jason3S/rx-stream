@@ -1,9 +1,8 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 import { Subject, interval } from 'rxjs';
 import { take, tap, bufferWhen, toArray, zip } from 'rxjs/operators';
-import {ISuiteCallbackContext} from 'mocha';
 
-describe('Experiment with Observable buffer', function (this: ISuiteCallbackContext) {
+describe('Experiment with Observable buffer', function () {
     this.timeout(10000);
 
     it('Demonstrates a bug with bufferWhen', () => {
@@ -11,16 +10,16 @@ describe('Experiment with Observable buffer', function (this: ISuiteCallbackCont
         const intervalRx = interval(1000);
         const trigger = new Subject<number>();
 
-        intervalRx
-            .pipe(tap(n => console.log(`Trigger ${n}`)))
-            .subscribe(trigger);
+        intervalRx.pipe(tap((n) => console.log(`Trigger ${n}`))).subscribe(trigger);
 
-        return src.pipe(
-            bufferWhen(() => trigger),
-            tap(v => console.log(v)),
-            toArray(),
-        ).toPromise()
-            .then(values => {
+        return src
+            .pipe(
+                bufferWhen(() => trigger),
+                tap((v) => console.log(v)),
+                toArray()
+            )
+            .toPromise()
+            .then((values) => {
                 console.log(values);
                 console.log('done.');
             });
@@ -40,14 +39,12 @@ describe('Experiment with Observable buffer', function (this: ISuiteCallbackCont
         const slow = interval(10).pipe(take(10));
         const fast = interval(3);
 
-        return slow.pipe(
-            zip(fast),
-            toArray(),
-        ).toPromise()
-            .then(values => {
+        return slow
+            .pipe(zip(fast), toArray())
+            .toPromise()
+            .then((values) => {
                 console.log(values);
                 values.forEach(([s, f]) => expect(s).to.be.equal(f));
             });
     });
 });
-
