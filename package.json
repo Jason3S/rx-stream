@@ -42,7 +42,7 @@
   "homepage": "https://github.com/Jason3S/rx-stream#readme",
   "devDependencies": {
     "@types/chai": "^4.2.11",
-    "@types/fs-extra": "^8.1.1",
+    "@types/fs-extra": "^9.0.9",
     "@types/mocha": "^8.2.2",
     "@types/node": "^8.10.66",
     "chai": "^4.2.0",
