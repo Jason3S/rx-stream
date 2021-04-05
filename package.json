@@ -47,7 +47,7 @@
     "@types/node": "^14.14.37",
     "chai": "^4.2.0",
     "coveralls": "^3.0.11",
-    "cspell": "^4.2.8",
+    "cspell": "^5.3.11",
     "fs-extra": "^9.0.0",
     "lorem-ipsum": "^2.0.3",
     "mocha": "^8.3.2",
