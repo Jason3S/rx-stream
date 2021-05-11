@@ -1,30 +1,26 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 import * as stream from 'stream';
 import { reduce, tap } from 'rxjs/operators';
 import { streamToStringRx } from './index';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 describe('Validate Rx From Stream', () => {
-    it('tests stream to Rx', () => {
-        const data: string = 'This is a bit of text to have some fun with';
+    it('tests stream to Rx', async () => {
+        const data = 'This is a bit of text to have some fun with';
         const bufferStream = new stream.PassThrough();
         bufferStream.end(data, 'utf8');
-        return streamToStringRx(bufferStream)
+        const result = await streamToStringRx(bufferStream)
             .pipe(reduce((a, b) => a + b))
-            .toPromise()
-            .then(result => {
-                expect(result).to.equal(data);
-            });
+            .toPromise();
+        expect(result).to.equal(data);
     });
 
     it('tests closing a stream', async () => {
-        const data: string = 'This is a bit of text to have some fun with';
+        const data = 'This is a bit of text to have some fun with';
         const bufferStream = new stream.PassThrough();
         const observable = streamToStringRx(bufferStream);
         bufferStream.write(data, 'utf8');
-        const result = observable
-            .pipe(reduce((a, b) => a + b))
-            .toPromise();
+        const result = observable.pipe(reduce((a, b) => a + b)).toPromise();
         bufferStream.destroy ? bufferStream.destroy() : bufferStream.end();
         expect(await result).to.equal(data);
     });
@@ -33,16 +29,14 @@ describe('Validate Rx From Stream', () => {
         const data = 'Some sample text';
         const bufferStream = new stream.PassThrough();
         const observable = streamToStringRx(bufferStream, 'utf8');
-        expect((observable as any).next).not.to.be.a('function');
+        expect((observable as Subject<string>).next).not.to.be.a('function');
         bufferStream.end(data, 'utf8');
-        const result = await observable
-            .pipe(reduce((a, b) => a + b))
-            .toPromise();
+        const result = await observable.pipe(reduce((a, b) => a + b)).toPromise();
         expect(result).to.equal(data);
     });
 
-    it('tests stream pause', done => {
-        const data: string = 'This is a bit of text to have some fun with';
+    it('tests stream pause', (done) => {
+        const data = 'This is a bit of text to have some fun with';
         const bufferStream = new stream.PassThrough();
         const delayTime = 20;
 
@@ -52,7 +46,7 @@ describe('Validate Rx From Stream', () => {
             bufferStream.end(data.slice(data.length / 2), 'utf8');
         }, delayTime);
 
-        return streamToStringRx(bufferStream, 'utf8', pauser)
+        streamToStringRx(bufferStream, 'utf8', pauser)
             .pipe(
                 tap(() => {
                     if (pauser.value === true) {
@@ -68,16 +62,15 @@ describe('Validate Rx From Stream', () => {
                 reduce((a, b) => a + b)
             )
             .subscribe({
-                next: result => {
+                next: (result) => {
                     expect(result).to.equal(data);
                 },
                 complete: () => {
                     done();
                 },
-                error: err => {
+                error: (err) => {
                     done(err);
-                }
+                },
             });
     });
-
 });
