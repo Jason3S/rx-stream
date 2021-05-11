@@ -38,3 +38,4 @@ jspm_packages
 
 # Ignore Built files
 dist/**
+temp

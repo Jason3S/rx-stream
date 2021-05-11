@@ -1,10 +1,7 @@
-import {expect} from 'chai';
-import {from, range, Observable, Subscriber, timer, Subscription} from 'rxjs';
-import {reduce, map, concatMap, take, finalize} from 'rxjs/operators';
-import {
-    rxToStream,
-    streamToStringRx,
-} from './index';
+import { expect } from 'chai';
+import { from, range, Observable, Subscriber, timer, Subscription } from 'rxjs';
+import { reduce, map, concatMap, take, finalize } from 'rxjs/operators';
+import { rxToStream, streamToStringRx } from './index';
 import { loremIpsum } from 'lorem-ipsum';
 import * as path from 'path';
 import { mkdirp } from 'fs-extra';
@@ -14,8 +11,8 @@ import * as stream from 'stream';
 import { Readable } from 'stream';
 
 describe('Validate to Stream', () => {
-    it('rxToStream', () => {
-        const data: string = 'This is a bit of text to have some fun with';
+    it('rxToStream', async () => {
+        const data = 'This is a bit of text to have some fun with';
         const src = from(data.split(' '));
 
         const injectedSubscription = new Subscription();
@@ -31,7 +28,7 @@ describe('Validate to Stream', () => {
 
         const stream = rxToStream(src);
 
-        const p = streamToStringRx(stream)
+        const result = await streamToStringRx(stream)
             .pipe(
                 reduce((a, b) => a + ' ' + b),
                 finalize(() => {
@@ -40,16 +37,12 @@ describe('Validate to Stream', () => {
                     stream.destroy();
                 })
             )
-            .toPromise()
-            .then(result => {
-                expect(result).to.equal(data);
-                expect(injectedSubscription.closed).to.be.true;
-            });
-
-        return p;
+            .toPromise();
+        expect(result).to.equal(data);
+        expect(injectedSubscription.closed).to.be.true;
     });
 
-    it('rxToStream with error', () => {
+    it('rxToStream with error', async () => {
         const src = Observable.create((observer: Subscriber<string>) => {
             setTimeout(() => observer.error(new Error('TEST_ERROR')), 1);
         });
@@ -59,21 +52,22 @@ describe('Validate to Stream', () => {
         });
 
         let errorCaught;
-        stream.on('error', err => (errorCaught = err));
+        stream.on('error', (err) => (errorCaught = err));
 
-        const p = streamToStringRx(stream)
+        const r = await streamToStringRx(stream)
             .toPromise()
-            .then(() => {
-                expect(errorCaught).to.have.property('message', 'TEST_ERROR');
-            })
-            .catch(() => {});
-
-        return p;
+            .then(
+                () => true,
+                () => false
+            );
+        expect(r).to.be.false;
+        expect(errorCaught).to.have.property('message', 'TEST_ERROR');
     });
 
-    it('rxToStream with promise error', () => {
-        const promise: Promise<string> = new Promise<string>((_: (value: string) => void, reject: (reason: string) => void) => {
-            reject('TEST_ERROR');
+    it('rxToStream with promise error', async () => {
+        // eslint-disable-next-line promise/param-names
+        const promise: Promise<string> = new Promise<string>((_resolve: (value: string) => void, reject: (reason: Error) => void) => {
+            reject(new Error('TEST_ERROR'));
         });
         const src = from(promise);
 
@@ -82,69 +76,65 @@ describe('Validate to Stream', () => {
         });
 
         let errorCaught;
-        stream.on('error', err => (errorCaught = err));
+        stream.on('error', (err) => (errorCaught = err));
 
-        const p = streamToStringRx(stream)
+        const r = await streamToStringRx(stream)
             .toPromise()
-            .then(() => {
-                expect(errorCaught).to.have.property('message', 'TEST_ERROR');
-            })
-            .catch(() => {});
-
-        return p;
+            .then(
+                () => true,
+                () => false
+            );
+        expect(r).to.be.false;
+        expect(errorCaught).to.have.property('message', 'TEST_ERROR');
     });
 
-    it('tests with a delayed hot observable', () => {
+    it('tests with a delayed hot observable', async () => {
         // This tests that we can send many small values to the stream one after another.
         // This is to make sure we do not run out of stack space.
         const max = 5;
         const src = timer(10, 1).pipe(take(max + 1));
-        const stream = rxToStream(src.pipe(map(a => a.toString())));
+        const stream = rxToStream(src.pipe(map((a) => a.toString())));
 
-        const p = streamToStringRx(stream).pipe(
-            map(a => Number.parseInt(a)),
-            reduce((a, b) => a + b),
-        ).toPromise()
-            .then(result => {
-                expect(result).to.equal((max * (max + 1)) / 2);
-            });
-
-        return p;
+        const result = await streamToStringRx(stream)
+            .pipe(
+                map((a) => Number.parseInt(a)),
+                reduce((a, b) => a + b)
+            )
+            .toPromise();
+        expect(result).to.equal((max * (max + 1)) / 2);
     });
 
-    it('rxToStream large range', () => {
+    it('rxToStream large range', async () => {
         // This tests that we can send many small values to the stream one after another.
         // This is to make sure we do not run out of stack space.
         const max = 5000;
         const src = range(1, max);
-        const stream = rxToStream(src.pipe(map(a => a.toString())));
+        const stream = rxToStream(src.pipe(map((a) => a.toString())));
 
-        const p = streamToStringRx(stream).pipe(
-            map(a => Number.parseInt(a)),
-            reduce((a, b) => a + b),
-        ).toPromise()
-            .then(result => {
-                expect(result).to.equal((max * (max + 1)) / 2);
-            });
-
-        return p;
+        const result = await streamToStringRx(stream)
+            .pipe(
+                map((a) => Number.parseInt(a)),
+                reduce((a, b) => a + b)
+            )
+            .toPromise();
+        expect(result).to.equal((max * (max + 1)) / 2);
     });
 
-    it('tests writing an Observable and reading it back.', function() {
+    it('tests writing an Observable and reading it back.', async () => {
         // cspell:ignore éåáí
-        const text = loremIpsum({ count: 1000, format: 'plain', units: 'words'}) + ' éåáí';
+        const text = loremIpsum({ count: 1000, format: 'plain', units: 'words' }) + ' éåáí';
         const data = text.split(/\b/);
-        const filename = path.join(__dirname, '..', '..', 'temp', 'tests-writing-an-observable.txt');
+        const filename = path.join(__dirname, '..', 'temp', 'tests-writing-an-observable.txt');
 
-        return from(mkdirp(path.dirname(filename))).pipe(
-            concatMap(() => writeToFileRxP(filename, from(data))),
-            concatMap(() => fs.readFile(filename) ),
-            map(buffer => buffer.toString()),
-            reduce((a, b) =>  a + b),
-        ).toPromise()
-            .then(result => {
-                expect(result).to.equal(text);
-            });
+        const result = await from(mkdirp(path.dirname(filename)))
+            .pipe(
+                concatMap(() => writeToFileRxP(filename, from(data))),
+                concatMap(() => fs.readFile(filename)),
+                map((buffer) => buffer.toString()),
+                reduce((a, b) => a + b)
+            )
+            .toPromise();
+        expect(result).to.equal(text);
     });
 
     function writeToFileRx(filename: string, data: Observable<string>): fs.WriteStream {

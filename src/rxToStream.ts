@@ -1,4 +1,4 @@
-import {Observable, Subscription} from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import * as stream from 'stream';
 
 export type Streamable = string | Buffer;
@@ -9,11 +9,7 @@ export interface ObjectReadableOptions extends stream.ReadableOptions {
 /**
  * Transform the output of an Observable into a node readable stream.
  */
-export function rxToStream<T>(
-    src: Observable<T>,
-    options: ObjectReadableOptions,
-    onError?: (error: Error, readable: stream.Readable) => void
-): stream.Readable;
+export function rxToStream<T>(src: Observable<T>, options: ObjectReadableOptions, onError?: (error: Error, readable: stream.Readable) => void): stream.Readable;
 export function rxToStream<T extends Streamable>(
     src: Observable<T>,
     options?: stream.ReadableOptions,
@@ -31,13 +27,14 @@ class ReadableObservableStream<T> extends stream.Readable {
     constructor(
         options: stream.ReadableOptions,
         private _source: Observable<T>,
-        private _onError: ((error: Error, readable: stream.Readable) => void) | undefined,
+        private _onError: ((error: Error, readable: stream.Readable) => void) | undefined
     ) {
         super(options);
     }
 
     private _isOpen = false;
     private _hasError = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _error: any;
     private _waiting = false;
     private _subscription: Subscription;
@@ -63,7 +60,7 @@ class ReadableObservableStream<T> extends stream.Readable {
             this._isOpen = true;
             this._waiting = true;
             this._subscription = this._source.subscribe({
-                next: value => {
+                next: (value) => {
                     if (this._waiting) {
                         this._waiting = this.push(value);
                     } else {
