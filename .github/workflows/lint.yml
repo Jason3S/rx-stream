@@ -2,6 +2,8 @@ name: "lint"
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
+    branches:
+      - main
 
 jobs:
   lint: # make sure build/ci work properly
