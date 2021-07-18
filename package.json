@@ -40,18 +40,18 @@
   },
   "homepage": "https://github.com/Jason3S/rx-stream#readme",
   "devDependencies": {
-    "@types/chai": "^4.2.18",
-    "@types/fs-extra": "^9.0.11",
-    "@types/mocha": "^8.2.2",
+    "@types/chai": "^4.2.21",
+    "@types/fs-extra": "^9.0.12",
+    "@types/mocha": "^8.2.3",
     "@types/node": "^16.3.0",
-    "@typescript-eslint/eslint-plugin": "^4.23.0",
-    "@typescript-eslint/parser": "^4.23.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
     "chai": "^4.2.0",
-    "coveralls": "^3.0.11",
-    "cspell": "^5.3.11",
-    "eslint": "^7.26.0",
+    "coveralls": "^3.1.1",
+    "cspell": "^5.6.6",
+    "eslint": "^7.31.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
@@ -59,18 +59,18 @@
     "lorem-ipsum": "^2.0.3",
     "mocha": "^8.4.0",
     "nyc": "^15.0.0",
-    "prettier": "^2.3.0",
+    "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.7",
     "ts-node": "^10.0.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.3.5"
   },
   "dependencies": {},
   "peerDependencies": {
     "rxjs": "^6.0.0"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.3.0"
   },
   "files": [
     "dist",

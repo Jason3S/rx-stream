@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { from, range, Observable, Subscriber, timer, Subscription } from 'rxjs';
+import { from, range, Observable, Subscriber, timer, Subscription, Subject } from 'rxjs';
 import { reduce, map, concatMap, take, finalize } from 'rxjs/operators';
 import { rxToStream, streamToStringRx } from './index';
 import { loremIpsum } from 'lorem-ipsum';
@@ -43,7 +43,7 @@ describe('Validate to Stream', () => {
     });
 
     it('rxToStream with error', async () => {
-        const src = Observable.create((observer: Subscriber<string>) => {
+        const src = new Observable((observer: Subscriber<string>) => {
             setTimeout(() => observer.error(new Error('TEST_ERROR')), 1);
         });
 
@@ -102,6 +102,40 @@ describe('Validate to Stream', () => {
             )
             .toPromise();
         expect(result).to.equal((max * (max + 1)) / 2);
+    });
+
+    it('tests lazy = true', async () => {
+        const text = 'Sometimes being lazy is fine.';
+        const src = from(text.split(''));
+        const stream = rxToStream(src);
+        const result = await streamToStringRx(stream)
+            .pipe(reduce((a, b) => a + b))
+            .toPromise();
+        expect(result).to.equal(text);
+    });
+
+    it('tests lazy = true for hot observable.', async () => {
+        const text = 'It is not always good to be lazy';
+        const src = new Subject<string>();
+        const stream = rxToStream(src);
+        src.next(text);
+        src.complete();
+        const result = await streamToStringRx(stream)
+            .pipe(reduce((a, b) => a + b, ''))
+            .toPromise();
+        expect(result).to.equal('');
+    });
+
+    it('tests lazy = false for hot observable.', async () => {
+        const text = 'The early bird gets the worm.';
+        const src = new Subject<string>();
+        const stream = rxToStream(src, { lazy: false, encoding: 'utf-8' });
+        src.next(text);
+        src.complete();
+        const result = await streamToStringRx(stream)
+            .pipe(reduce((a, b) => a + b, ''))
+            .toPromise();
+        expect(result).to.equal(text);
     });
 
     it('rxToStream large range', async () => {
