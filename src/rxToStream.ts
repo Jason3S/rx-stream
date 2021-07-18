@@ -57,7 +57,7 @@ class ReadableObservableStream<T> extends stream.Readable {
     ) {
         super(streamOptions(options));
         if (options.lazy === false) {
-            this.subscribe();
+            this.subscribeIfNecessary();
         }
     }
 
@@ -70,7 +70,7 @@ class ReadableObservableStream<T> extends stream.Readable {
     _read() {
         const { _buffer } = this;
 
-        this.subscribe();
+        this.subscribeIfNecessary();
 
         if (_buffer.length > 0) {
             while (_buffer.length > 0) {
@@ -90,7 +90,7 @@ class ReadableObservableStream<T> extends stream.Readable {
         }
     }
 
-    private subscribe() {
+    private subscribeIfNecessary() {
         if (this._subscription) return;
 
         const { _buffer } = this;
