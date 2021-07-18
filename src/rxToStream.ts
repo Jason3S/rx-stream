@@ -2,7 +2,18 @@ import { Observable, Subscription } from 'rxjs';
 import * as stream from 'stream';
 
 export type Streamable = string | Buffer;
-export interface ObjectReadableOptions extends stream.ReadableOptions {
+
+export interface ReadableObservableStreamOptions extends stream.ReadableOptions {
+    /**
+     * Determines when to subscribe to the observable.
+     * true - delay the subscription until the first read
+     * false - subscribe immediately and buffer any data until the first read.
+     * @default true
+     */
+    lazy?: boolean;
+}
+
+export interface ObjectReadableOptions extends ReadableObservableStreamOptions {
     objectMode: true;
 }
 
@@ -12,26 +23,18 @@ export interface ObjectReadableOptions extends stream.ReadableOptions {
 export function rxToStream<T>(src: Observable<T>, options: ObjectReadableOptions, onError?: (error: Error, readable: stream.Readable) => void): stream.Readable;
 export function rxToStream<T extends Streamable>(
     src: Observable<T>,
-    options?: stream.ReadableOptions,
+    options?: ReadableObservableStreamOptions,
     onError?: (error: Error, readable: stream.Readable) => void
 ): stream.Readable;
 export function rxToStream<T extends Streamable>(
     src: Observable<T>,
-    options: stream.ReadableOptions = { encoding: 'utf8' },
+    options: ReadableObservableStreamOptions = { encoding: 'utf8' },
     onError?: (error: Error, readable: stream.Readable) => void
 ): stream.Readable {
     return new ReadableObservableStream(options, src, onError);
 }
 
 class ReadableObservableStream<T> extends stream.Readable {
-    constructor(
-        options: stream.ReadableOptions,
-        private _source: Observable<T>,
-        private _onError: ((error: Error, readable: stream.Readable) => void) | undefined
-    ) {
-        super(options);
-    }
-
     private _isOpen = false;
     private _hasError = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,6 +50,17 @@ class ReadableObservableStream<T> extends stream.Readable {
         }
     }
 
+    constructor(
+        options: ReadableObservableStreamOptions,
+        private _source: Observable<T>,
+        private _onError: ((error: Error, readable: stream.Readable) => void) | undefined
+    ) {
+        super(streamOptions(options));
+        if (options.lazy === false) {
+            this.subscribe();
+        }
+    }
+
     _destroy() {
         if (this._subscription) {
             this._subscription.unsubscribe();
@@ -56,33 +70,7 @@ class ReadableObservableStream<T> extends stream.Readable {
     _read() {
         const { _buffer } = this;
 
-        if (!this._subscription) {
-            this._isOpen = true;
-            this._waiting = true;
-            this._subscription = this._source.subscribe({
-                next: (value) => {
-                    if (this._waiting) {
-                        this._waiting = this.push(value);
-                    } else {
-                        _buffer.push(value);
-                    }
-                },
-                error: (err) => {
-                    this._isOpen = false;
-                    this._hasError = true;
-                    this._error = err;
-                    if (this._waiting) {
-                        this.emitError();
-                    }
-                },
-                complete: () => {
-                    this._isOpen = false;
-                    if (this._waiting) {
-                        this.push(null);
-                    }
-                },
-            });
-        }
+        this.subscribe();
 
         if (_buffer.length > 0) {
             while (_buffer.length > 0) {
@@ -101,4 +89,40 @@ class ReadableObservableStream<T> extends stream.Readable {
             }
         }
     }
+
+    private subscribe() {
+        if (this._subscription) return;
+
+        const { _buffer } = this;
+        this._isOpen = true;
+        this._waiting = true;
+        this._subscription = this._source.subscribe({
+            next: (value) => {
+                if (this._waiting) {
+                    this._waiting = this.push(value);
+                } else {
+                    _buffer.push(value);
+                }
+            },
+            error: (err) => {
+                this._isOpen = false;
+                this._hasError = true;
+                this._error = err;
+                if (this._waiting) {
+                    this.emitError();
+                }
+            },
+            complete: () => {
+                this._isOpen = false;
+                if (this._waiting) {
+                    this.push(null);
+                }
+            },
+        });
+    }
+}
+
+function streamOptions(options: ReadableObservableStreamOptions): stream.ReadableOptions {
+    const { lazy: _, ...streamOptions } = options;
+    return streamOptions;
 }
