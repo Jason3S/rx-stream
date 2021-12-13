@@ -21,6 +21,7 @@
     "prepare": "npm run clean-build",
     "prepublishOnly": "npm test",
     "coverage-coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "release": "npx standard-version",
     "travis-coverage": "npm run generate-code-coverage && npm run coverage-coveralls",
     "test": "mocha --recursive \"dist/**/*.test.js\""
   },
