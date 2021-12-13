@@ -1,6 +1,6 @@
 # rxjs-stream
 
-This is a simple library for converting to and from NodeJS stream and rxjs 7.
+This is a simple library for converting to and from NodeJS stream and [RxJS](https://rxjs.dev/) 7.
 
 This was created to fill the gap left by [rx-node](https://www.npmjs.com/package/rx-node),
 which only works with rxjs 4.
@@ -70,3 +70,8 @@ stream.pipe(process.stdout);
 ## Compatibility
 
 This library is tested with Node 12 and above.
+
+| rx-stream | RxJS | Node |
+| --------- | ---- | ---- |
+| 4.x       | 7.x  | >=12 |
+| 3.x       | 6.x  | >=10 |
