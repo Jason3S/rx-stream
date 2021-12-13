@@ -16,7 +16,7 @@ npm install --save rxjs rxjs-stream
 ### Writing to a stream.
 
 ```typescript
-import {rxToStream} from 'rxjs-stream';
+import { rxToStream } from 'rxjs-stream';
 
 let data = 'This is a bit of text to have some fun with';
 let src = Rx.Observable.from(data.split(' '));
@@ -28,10 +28,10 @@ rxToStream(src).pipe(process.stdout);
 To write objects, you must pass in the `ReadableOptions` with `objectMode` to be true: `{ objectMode: true }`
 
 ```typescript
-import {rxToStream} from 'rxjs-stream';
+import { rxToStream } from 'rxjs-stream';
 
 let data = 'This is a bit of text to have some fun with';
-let wordObj = data.split(' ').map(text => ({ text }));
+let wordObj = data.split(' ').map((text) => ({ text }));
 let src = Rx.Observable.from(wordObj);
 let stream = rxToStream(src, { objectMode: true });
 ```
@@ -39,11 +39,10 @@ let stream = rxToStream(src, { objectMode: true });
 ### Read from a stream
 
 ```typescript
-import {rxToStream, streamToStringRx} from 'rxjs-stream';
+import { rxToStream, streamToStringRx } from 'rxjs-stream';
 
 // Read stdin and make it upper case then send it to stdout
-let ob = streamToStringRx(process.stdin)
-    .map(text => text.toUpperCase());
+let ob = streamToStringRx(process.stdin).map((text) => text.toUpperCase());
 
 rxToStream(ob).pipe(process.stdout);
 ```
@@ -58,11 +57,11 @@ Example:
 
 ```typescript
 import * as loremIpsum from 'lorem-ipsum';
-import {rxToStream} from 'rxjs-stream';
+import { rxToStream } from 'rxjs-stream';
 
-let book = loremIpsum({ count: 1000, format: 'plain', units: 'paragraphs'});
+let book = loremIpsum({ count: 1000, format: 'plain', units: 'paragraphs' });
 let words = Rx.Observable.from(book.split(/\b/));
-let wordsBuffered = words.bufferCount(1000).map(words => words.join(''));
+let wordsBuffered = words.bufferCount(1000).map((words) => words.join(''));
 let stream = rxToStream(wordsBuffered);
 
 stream.pipe(process.stdout);
@@ -70,4 +69,4 @@ stream.pipe(process.stdout);
 
 ## Compatibility
 
-This library is tested with Node 10 and above.
+This library is tested with Node 12 and above.
