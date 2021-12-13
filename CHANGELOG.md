@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0] (https://github.com/Jason3S/rx-stream/compare/v3.3.0...v4.0.0) (2021-12-08)
+
+* Move to RxJs 7
+
 ## [3.3.0](https://github.com/Jason3S/rx-stream/compare/v3.2.1...v3.3.0) (2021-07-18)
 
 
