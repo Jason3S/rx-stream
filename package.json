@@ -1,6 +1,6 @@
 {
   "name": "rxjs-stream",
-  "version": "4.0.2",
+  "version": "5.0.0",
   "description": "nodejs streams for rxjs 7",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
