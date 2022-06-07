@@ -42,6 +42,7 @@
   },
   "homepage": "https://github.com/Jason3S/rx-stream#readme",
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
     "@types/node": "^17.0.40",
@@ -63,7 +64,7 @@
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.5",
-    "ts-node": "^10.8.1",
+    "ts-node": "^10.8.0",
     "typescript": "^4.7.3"
   },
   "dependencies": {
@@ -82,6 +83,8 @@
     "!**/*.spec.*"
   ],
   "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
     "include": [
       "src/**/*.ts"
     ],
@@ -90,9 +93,6 @@
     ],
     "extension": [
       ".ts"
-    ],
-    "require": [
-      "ts-node/register"
     ],
     "reporter": [
       "lcov",
