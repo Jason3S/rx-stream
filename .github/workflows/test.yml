@@ -15,7 +15,7 @@ jobs:
           - 12.x
           - 14.x
           - 16.x
-          - 17.x
+          - 18.x
 
         os:
           - ubuntu-latest
@@ -27,6 +27,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
       - run: |
           npm install
           npm test
@@ -41,8 +42,17 @@ jobs:
           - windows-latest
           - macos-latest
 
+        node-version:
+          - 18.x
+
     steps:
       - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - run: |
           npm install
           npm test
