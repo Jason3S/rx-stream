@@ -1,5 +1,9 @@
 # rxjs-stream
 
+> **Note**
+> With the addition of [Async Iternables](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_async_iterator_and_async_iterable_protocols),
+> this library is no longer necessary.
+
 This is a simple library for converting to and from NodeJS stream and [RxJS](https://rxjs.dev/) 7.
 
 This was created to fill the gap left by [rx-node](https://www.npmjs.com/package/rx-node),
